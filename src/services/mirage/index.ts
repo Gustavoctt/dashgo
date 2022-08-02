@@ -11,7 +11,7 @@ type User = {
 export function makeServer(){
   const server = createServer({
     models:{
-      users: Model.extend<Partial<User>>({})
+      user: Model.extend<Partial<User>>({})
     },
 
     factories: {
