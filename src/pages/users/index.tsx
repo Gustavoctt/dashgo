@@ -1,5 +1,5 @@
-import { Box, Button, Checkbox, Flex, Heading, Icon, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr, useBreakpointValue } from "@chakra-ui/react";
-import Link from "next/link";
+import { Box, Button, Checkbox, Flex, Heading, Icon, Link, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr, useBreakpointValue } from "@chakra-ui/react";
+import NextLink from "next/link";
 import { useState } from "react";
 
 import { RiAddLine, RiPencilLine } from "react-icons/ri";
@@ -7,7 +7,9 @@ import { RiAddLine, RiPencilLine } from "react-icons/ri";
 import { Header } from "../../components/Header";
 import { Pagination } from "../../components/Pagination";
 import { Sidebar } from "../../components/Sidebar";
+import { api } from "../../services/api";
 import { useUsers } from "../../services/hooks/useUsers";
+import { queryClient } from "../../services/queryClient";
 
 export default function ListUsers(){
   const [page, setPage] = useState(1);
@@ -17,6 +19,17 @@ export default function ListUsers(){
     base: false,
     lg: true,
   })
+
+  async function handlePrefetchUser(userId: string){
+    //Prefetch faz um pré-carregamento de dados, assim tornando a aplicação mais "rápida"
+    await queryClient.prefetchQuery(['user', userId], async () => {
+      const response = await api.get(`/users/${userId}`)
+
+      return response.data;
+    },{
+      staleTime: 1000 * 60 * 10, //10 minutes
+    })
+  }
 
   return(
     <>
@@ -37,7 +50,7 @@ export default function ListUsers(){
                 {!isLoading && isFetching && <Spinner size="sm" color="gray.500" ml="6"/>}
               </Heading>
 
-              <Link href="/users/create" passHref>
+              <NextLink href="/users/create" passHref>
                 <Button
                   as="a"
                   size="sm"
@@ -47,7 +60,7 @@ export default function ListUsers(){
                 >
                   Criar novo
                 </Button>
-              </Link>
+              </NextLink>
             </Flex>
 
             { isLoading ? (
@@ -80,7 +93,9 @@ export default function ListUsers(){
                         </Td>
                         <Td>
                           <Box>
-                            <Text fontWeight="bold">{user.name}</Text>
+                            <Link onMouseEnter={() => handlePrefetchUser(user.id)} >
+                              <Text fontWeight="bold">{user.name}</Text>
+                            </Link>
                             <Text fontSize="sm" color="gray.300">{user.email}</Text>
                           </Box>
                         </Td>

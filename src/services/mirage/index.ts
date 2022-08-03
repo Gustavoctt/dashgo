@@ -1,4 +1,4 @@
-import { createServer, Factory, Model, Response } from 'miragejs';
+import { ActiveModelSerializer, createServer, Factory, Model, Response } from 'miragejs';
 
 import { faker } from '@faker-js/faker';
 
@@ -10,10 +10,12 @@ type User = {
 
 export function makeServer(){
   const server = createServer({
+    serializers:{
+      application: ActiveModelSerializer,
+    },
     models:{
       user: Model.extend<Partial<User>>({})
     },
-
     factories: {
       user: Factory.extend({
         name(){
@@ -29,7 +31,7 @@ export function makeServer(){
     },
 
     seeds(server){
-      server.createList('user', 100);
+      server.createList('user', 18);
     },
     routes(){
       this.namespace = 'api';
@@ -52,6 +54,8 @@ export function makeServer(){
         )
 
       });
+
+      this.get('/users/:id')
       this.post('/users')
 
       this.namespace = '';

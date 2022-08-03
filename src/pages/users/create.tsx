@@ -1,5 +1,5 @@
-import { Box, Button, Divider, Flex, Heading, HStack, SimpleGrid, VStack } from "@chakra-ui/react";
 import Link from "next/link";
+import { Box, Button, Divider, Flex, Heading, HStack, SimpleGrid, VStack } from "@chakra-ui/react";
 
 import { useForm, SubmitHandler } from 'react-hook-form';
 import * as yup from 'yup';
@@ -8,6 +8,9 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Input } from "../../components/Form/Input";
 import { Header } from "../../components/Header";
 import { Sidebar } from "../../components/Sidebar";
+import { useMutation } from "@tanstack/react-query";
+import { api } from "../../services/api";
+import { useRouter } from "next/router";
 
 type CreateUserData = {
   name: string;
@@ -26,6 +29,19 @@ const createUsersFormSchema = yup.object().shape({
 })
 
 export default function CreateUsers(){
+  const router = useRouter();
+  // Com o useMutation eu consigo verificar se occoreu erro, sucesso...
+  const createUser = useMutation(async (users: CreateUserData) => {
+    const response = await api.post('users', {
+      user: {
+        ...users,
+        created_at: new Date()
+      }
+    })
+    console.log(response.data.user)
+    router.push('/users');
+  })
+
   const { register, formState, handleSubmit } = useForm({
     resolver: yupResolver(createUsersFormSchema)
   })
@@ -34,7 +50,8 @@ export default function CreateUsers(){
 
   const handleCreateUsers: SubmitHandler<CreateUserData> = async (values) => {
     await new Promise(resolve => setTimeout(resolve, 2000))
-    console.log(values)
+    
+    await createUser.mutateAsync(values);
   }
 
 
