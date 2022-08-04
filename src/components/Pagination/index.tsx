@@ -44,7 +44,7 @@ export function Pagination({
       align="center"
     >
       <Box>
-        <strong>0</strong> - <strong>{ totalCountsOfRegisters < registersPerPage ? totalCountsOfRegisters : registersPerPage }</strong> de <strong>{ totalCountsOfRegisters }</strong>
+        <strong>0</strong> - <strong> 10 </strong> de <strong>{ totalCountsOfRegisters }</strong>
       </Box>
 
       <Stack direction="row" spacing="2">
